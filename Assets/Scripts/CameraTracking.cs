@@ -23,30 +23,24 @@ public class CameraTracking : MonoBehaviour
     {
         correctedPos = transform.position;
 
-        // Check if the camera needs to adjust on the X-axis
-        if (transform.position.x - player.position.x < -wiggleRoomX)
-        {
+        //Move camera if wiggleroom is reached
+        if (transform.position.x - player.position.x < -wiggleRoomX){
             correctedPos.x = player.position.x - wiggleRoomX;
         }
-        else if (transform.position.x - player.position.x > wiggleRoomX)
-        {
+        else if (transform.position.x - player.position.x > wiggleRoomX){
             correctedPos.x = player.position.x + wiggleRoomX;
         }
 
-        // Check if the camera needs to adjust on the Y-axis
-        if (transform.position.y - player.position.y < -wiggleRoomY)
-        {
+        if (transform.position.y - player.position.y < -wiggleRoomY){
             correctedPos.y = player.position.y - wiggleRoomY;
         }
-        else if (transform.position.y - player.position.y > wiggleRoomY)
-        {
+        else if (transform.position.y - player.position.y > wiggleRoomY){
             correctedPos.y = player.position.y + wiggleRoomY;
         }
 
-        // Maintain the fixed Z position
         correctedPos.z = player.position.z;
 
-        // Apply the offset and set the camera's position
+        // set final camera position
         transform.position = correctedPos + offset;
     }
 }

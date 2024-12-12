@@ -17,12 +17,6 @@ public class PlayerMovement : MonoBehaviour{
     private GameObject currentPlatform;
     public AudioSource audioSourceJump;
 
-    // Start is called before the first frame update
-    void Start(){
-        
-    }
-
-    // Update is called once per frame
     void Update(){
         playerBody.freezeRotation = false;
         //Checks to see if player is holding "ragdoll" button

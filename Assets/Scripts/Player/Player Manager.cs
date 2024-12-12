@@ -25,80 +25,69 @@ public class PlayerManager : MonoBehaviour
     public AudioSource audioSourcePower;
     public AudioSource audioSourceHit;
 
-    void Start()
-    {
+    void Start(){
         originalColor = playerRenderer.material.color;
         playerMovement = GetComponent<PlayerMovement>();
         originalScale = transform.localScale;
     }
 
-    void Update()
-    {
-        // If invincible reduce timer and check to see if it ends
-        if (isInvincible)
-        {
+    void Update(){
+        //Invincible timer
+        if (isInvincible){
             invincibilityTimer -= Time.deltaTime;
-            if (invincibilityTimer <= 0f)
-            {
+            if (invincibilityTimer <= 0f){
                 isInvincible = false;
                 playerRenderer.material.color = originalColor;
             }
         }
 
-        // Check if the player presses 'R' to respawn at checkpoint
+        //R to respawn
         if (Input.GetKeyDown(KeyCode.R) && currentCheckpoint != null)
             RespawnAtCheckpoint();
 
+        //Esc to exit
         if (Input.GetKeyDown(KeyCode.Escape))
             SceneManager.LoadScene("Menu");
     }
 
-    void OnCollisionEnter2D(Collision2D collision)
-    {
-        // Check if collision is a threat
-        if (!isInvincible && collision.gameObject.CompareTag("Threat"))
-        {
+    void OnCollisionEnter2D(Collision2D collision){
+        //Check if damage
+        if (!isInvincible && collision.gameObject.CompareTag("Threat")){
             playerHealth -= 1;
             Debug.Log("Player Health: " + playerHealth);
 
-            // Trigger invincibility and reset timer
+            //Invincible
             isInvincible = true;
             invincibilityTimer = invincibilityDuration;
             playerRenderer.material.color = Color.Lerp(originalColor, Color.red, 0.5f);
             audioSourceHit.Play();
             
-            // Check if dead
-            if (playerHealth <= 0)
-            {
+            //Die/respawn
+            if (playerHealth <= 0){
                 RespawnAtCheckpoint();
                 playerHealth = 3;
                 Debug.Log("Player has died.");
                 playerLives -= 1;
             }
-            // Check if the player has lost
-            if (playerLives <= 0)
-            {
+            //Lose
+            if (playerLives <= 0){
                 StartCoroutine(DisplayUICoroutine(losePrefab, 3));
                 Debug.Log("Player has lost.");
             }
         }
     }
 
-    void OnTriggerEnter2D(Collider2D other)
-    {
-        // Check if collision is with a checkpoint
-        if (other.gameObject.CompareTag("Checkpoint"))
-        {
+    void OnTriggerEnter2D(Collider2D other){
+        //Checkpoint handling
+        if (other.gameObject.CompareTag("Checkpoint")){
             currentCheckpoint = other.gameObject;
             Debug.Log("Checkpoint saved at: " + currentCheckpoint.transform.position);
         }
 
-        // Check if collision is with a power-up
-        if (other.gameObject.CompareTag("Power"))
-        {
+        //Power up handling
+        if (other.gameObject.CompareTag("Power")){
             PowerUp powerUp = other.gameObject.GetComponent<PowerUp>();
-            if (powerUp != null)
-            {
+            if (powerUp != null){
                 audioSourcePower.Play();
                 HandlePowerUp(powerUp.powerUp);
                 Destroy(other.gameObject);
@@ -110,18 +99,15 @@ public class PlayerManager : MonoBehaviour
         }
     }
 
-    private void HandlePowerUp(int powerUpType)
-    {
-        switch (powerUpType)
-        {
-            case 1: // Shrink the player to half size
+    private void HandlePowerUp(int powerUpType){
+        switch (powerUpType){
+            case 1:
                 StartCoroutine(ShrinkPlayer());
                 break;
-            case 2: // Increase speed by 2
+            case 2: 
                 StartCoroutine(IncreaseSpeed());
                 break;
-            case 3: // Make the player invincible
-                //StartCoroutine(GrantTemporaryInvincibility());
+            case 3:
                 isInvincible = true;
                 invincibilityTimer = 10f;
                 playerRenderer.material.color = Color.Lerp(originalColor, Color.yellow, 0.5f);
@@ -132,33 +118,20 @@ public class PlayerManager : MonoBehaviour
         }
     }
 
-    private IEnumerator ShrinkPlayer()
-    {
+    private IEnumerator ShrinkPlayer(){
         transform.localScale = originalScale * 0.5f;
         yield return new WaitForSeconds(10f);
         transform.localScale = originalScale;
     }
 
-    private IEnumerator IncreaseSpeed()
-    {
+    private IEnumerator IncreaseSpeed(){
         playerMovement.speed += 2f;
         yield return new WaitForSeconds(10f);
         playerMovement.speed -= 2f;
     }
 
-    private IEnumerator GrantTemporaryInvincibility()
-    {
-        isInvincible = true;
-        playerRenderer.material.color = Color.yellow;
-        yield return new WaitForSeconds(10f);
-        isInvincible = false;
-        playerRenderer.material.color = originalColor;
-    }
-
-    private void RespawnAtCheckpoint()
-    {
-        if (currentCheckpoint != null)
-        {
+    private void RespawnAtCheckpoint(){
+        if (currentCheckpoint != null){
             transform.position = currentCheckpoint.transform.position;
             playerHealth = 3;
             Debug.Log("Player respawned at checkpoint: " + currentCheckpoint.transform.position);
@@ -178,8 +151,7 @@ public class PlayerManager : MonoBehaviour
         Destroy(canvasInstance);
     }
 
-    private void ResetScene()
-    {
+    private void ResetScene(){
         SceneManager.LoadScene(SceneManager.GetActiveScene().name);
     }
 }
